@@ -4,6 +4,12 @@
 
 A desktop application for Linux (Debian) written in Rust that focuses on visualizing control flow and dependency graphs from LLVM IR and bitcode files.
 
+## Claude Chat
+
+![https://claude.ai/chat/5a5290b5-3e68-41fb-bd01-5ef6d6b3dbf0][Here]
+
+https://claude.ai/chat/5a5290b5-3e68-41fb-bd01-5ef6d6b3dbf0
+
 ## Input Types
 
 - LLVM IR files (.ll)
@@ -191,27 +197,80 @@ pretty_assertions = "1.3"
 
 ```
 src/
-├── main.rs
-├── lib.rs
-├── llvm/
+├── main.rs                 # Application entry point
+├── lib.rs                  # Library root and public API
+│
+├── project/                # Project analysis and build system integration
+│   ├── mod.rs             # Module definition and public interface
+│   ├── cmake.rs           # CMake project handling
+│   ├── make.rs            # Makefile project handling
+│   ├── compiler.rs        # Compiler command handling
+│   └── config.rs          # Project configuration
+│
+├── llvm/                   # LLVM integration
+│   ├── mod.rs             # Module definition
+│   ├── context.rs         # LLVM context management
+│   ├── module.rs          # LLVM module handling
+│   ├── analysis/          # Analysis passes
+│   │   ├── mod.rs
+│   │   ├── control_flow.rs
+│   │   ├── data_flow.rs
+│   │   └── call_graph.rs
+│   └── types.rs           # LLVM type system abstractions
+│
+├── graph/                  # Graph construction and manipulation
+│   ├── mod.rs             # Module definition
+│   ├── builder.rs         # Graph construction
+│   ├── node.rs            # Node implementations
+│   ├── edge.rs            # Edge implementations
+│   ├── layout/            # Layout algorithms
+│   │   ├── mod.rs
+│   │   ├── force.rs       # Force-directed layout
+│   │   └── hierarchical.rs # Hierarchical layout
+│   └── transform.rs       # Graph transformations
+│
+├── viz/                    # Visualization
+│   ├── mod.rs             # Module definition
+│   ├── renderer.rs        # Rendering engine
+│   ├── window.rs          # Window management
+│   ├── interaction.rs     # User interaction handling
+│   ├── camera.rs          # View management
+│   └── style.rs           # Visual styling
+│
+├── util/                   # Utility functions
 │   ├── mod.rs
-│   ├── analysis.rs
-│   └── types.rs
-├── graph/
-│   ├── mod.rs
-│   ├── builder.rs
-│   └── representation.rs
-├── viz/
-│   ├── mod.rs
-│   └── renderer.rs
-└── error/
-    └── mod.rs
-    
-benches/
-└── graph_benchmarks.rs
+│   ├── geometry.rs        # Geometric calculations
+│   └── algorithms.rs      # Common algorithms
+│
+└── error/                  # Error handling
+    ├── mod.rs             # Error types and handling
+    └── conversion.rs      # Error conversion traits
 
 tests/
-└── integration_tests.rs
+├── integration/           # Integration tests
+│   ├── project_tests.rs
+│   ├── llvm_tests.rs
+│   ├── graph_tests.rs
+│   └── viz_tests.rs
+│
+└── fixtures/             # Test fixtures
+    ├── cmake_project/
+    ├── make_project/
+    └── ir_samples/
+
+benches/                  # Performance benchmarks
+├── graph_benches.rs
+└── layout_benches.rs
+
+examples/                 # Usage examples
+├── basic_cfg.rs          # Control Flow Graph example
+├── call_graph.rs         # Call Graph example
+└── data_flow.rs          # Data Flow Graph example
+
+docs/                     # Documentation
+├── architecture.md       # Architecture documentation
+├── algorithms.md         # Algorithm documentation
+└── api.md               # API documentation
 ```
 
 ## Installation Requirements
