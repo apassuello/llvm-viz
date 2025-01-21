@@ -1,7 +1,7 @@
 // See https://github.com/banach-space/llvm-tutor/blob/main/HelloWorld/HelloWorld.cpp
 // for a more detailed explanation.
 
-use llvm_plugin::inkwell::values::FunctionValue;
+use llvm_plugin::inkwell::values::{CallSiteValue, FunctionValue};
 use llvm_plugin::{
     FunctionAnalysisManager, LlvmFunctionPass, PassBuilder, PipelineParsing, PreservedAnalyses,
 };
@@ -25,11 +25,23 @@ impl LlvmFunctionPass for HelloWorldPass {
         function: &mut FunctionValue,
         _manager: &FunctionAnalysisManager,
     ) -> PreservedAnalyses {
+        eprintln!("(llvm-tutor) -------------");
         eprintln!("(llvm-tutor) Hello from: {:?}", function.get_name());
         eprintln!(
             "(llvm-tutor)   number of arguments: {}",
             function.count_params()
         );
+
+        for basic_block in function.get_basic_blocks() {
+            for instruction in basic_block.get_instructions() {
+                if let Ok(csv) = CallSiteValue::try_from(instruction) {
+                    eprintln!(
+                        "(llvm-tutor)   callees: {:?}",
+                        csv.get_called_fn_value().get_name()
+                    );
+                }
+            }
+        }
         PreservedAnalyses::All
     }
 }
