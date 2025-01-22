@@ -32,12 +32,24 @@ impl LlvmFunctionPass for HelloWorldPass {
             function.count_params()
         );
 
+        /* Equivalent code in C++
+
+           for (auto &bb : function) {
+               for (auto &instruction : bb) {
+                   if (CallInst *callInst = dyn_cast<CallInst>(&instruction)) {
+                       if (Function *calledFunction = callInst->getCalledFunction()) {
+                           std::cerr << calledFunction->getName();
+                       }
+                   }
+               }
+           }
+        */
         for basic_block in function.get_basic_blocks() {
             for instruction in basic_block.get_instructions() {
-                if let Ok(csv) = CallSiteValue::try_from(instruction) {
+                if let Ok(call_site_value) = CallSiteValue::try_from(instruction) {
                     eprintln!(
                         "(llvm-tutor)   callees: {:?}",
-                        csv.get_called_fn_value().get_name()
+                        call_site_value.get_called_fn_value().get_name()
                     );
                 }
             }
