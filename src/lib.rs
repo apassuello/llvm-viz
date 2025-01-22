@@ -63,16 +63,16 @@ impl LlvmModulePass for CustomPass {
                }
             */
 
-            let current_function = omega_tree.add_node(function.into());
+            let current_function = get_index_or_insert(&mut omega_tree, function.into());
 
             for basic_block in function.get_basic_blocks() {
                 for instruction in basic_block.get_instructions() {
                     if let Ok(call_site_value) = CallSiteValue::try_from(instruction) {
-                        let callee =
-                            omega_tree.add_node(call_site_value.get_called_fn_value().into());
+                        let callee = get_index_or_insert(
+                            &mut omega_tree,
+                            call_site_value.get_called_fn_value().into(),
+                        );
                         omega_tree.add_edge(current_function, callee, ());
-
-                        //let
                     }
                 }
             }
