@@ -9,6 +9,7 @@ use llvm_plugin::{
 };
 
 use petgraph::dot::{Config, Dot};
+use petgraph::graph::NodeIndex;
 use petgraph::Graph;
 
 #[llvm_plugin::plugin(name = "plugin_name", version = "0.1")]
@@ -34,6 +35,13 @@ impl From<values::FunctionValue<'_>> for Function {
             name: item.get_name().to_str().expect("").into(),
         }
     }
+}
+
+fn get_index_or_insert<E>(graph: &mut Graph<Function, E>, node: Function) -> NodeIndex {
+    graph
+        .node_indices()
+        .find(|ix| graph[*ix].name == node.name)
+        .unwrap_or_else(|| graph.add_node(node))
 }
 
 struct CustomPass;
