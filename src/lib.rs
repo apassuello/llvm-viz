@@ -7,6 +7,7 @@ use llvm_plugin::inkwell::values::CallSiteValue;
 use llvm_plugin::{
     LlvmModulePass, ModuleAnalysisManager, PassBuilder, PipelineParsing, PreservedAnalyses,
 };
+use serde::Serialize;
 
 use petgraph::dot::{Config, Dot};
 use petgraph::graph::NodeIndex;
@@ -24,7 +25,7 @@ fn plugin_registrar(builder: &mut PassBuilder) {
     });
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize)]
 struct Function {
     name: String,
 }
@@ -80,6 +81,13 @@ impl LlvmModulePass for CustomPass {
         eprintln!(
             "{:?}",
             Dot::with_config(&omega_tree, &[Config::EdgeNoLabel])
+        );
+
+        eprintln!("==========");
+
+        eprintln!(
+            "{:?}",
+            serde_json::to_string_pretty(&omega_tree).expect("Could not Serialize the tree")
         );
 
         PreservedAnalyses::All
