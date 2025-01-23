@@ -6,6 +6,10 @@ edition = "2021"
 [lib]
 crate-type = ["dylib"]
 
+[[bin]]
+name = "viz"
+path = "src/viz/main.rs"
+
 [dependencies]
 llvm-plugin = { version = "0.6.0", features = ["llvm18-0"] }
 petgraph = { version = "0.7.1", features = ["serde-1"] }
