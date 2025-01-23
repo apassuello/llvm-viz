@@ -93,12 +93,8 @@ impl LlvmModulePass for CustomPass {
             Dot::with_config(&omega_tree, &[Config::EdgeNoLabel])
         );
 
-        eprintln!("==========");
-
-        eprintln!(
-            "{:?}",
-            serde_json::to_string_pretty(&omega_tree).expect("Could not Serialize the tree")
-        );
+        ser_to_file(Path::new("omega_tree.json"), &omega_tree)
+            .expect("Could not Serialize `omega_tree` to file");
 
         PreservedAnalyses::All
     }
