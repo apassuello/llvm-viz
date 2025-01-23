@@ -1,6 +1,11 @@
 // See https://github.com/banach-space/llvm-tutor/blob/main/HelloWorld/HelloWorld.cpp
 // for a more detailed explanation.
 
+use std::error::Error;
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
+
 use llvm_plugin::inkwell::module::Module;
 use llvm_plugin::inkwell::values;
 use llvm_plugin::inkwell::values::CallSiteValue;
@@ -43,6 +48,11 @@ fn get_index_or_insert<E>(graph: &mut Graph<Function, E>, node: Function) -> Nod
         .node_indices()
         .find(|ix| graph[*ix].name == node.name)
         .unwrap_or_else(|| graph.add_node(node))
+}
+
+fn ser_to_file<T: Serialize>(path: &Path, data: &T) -> Result<(), Box<dyn Error>> {
+    let mut file = File::create(path)?;
+    Ok(file.write_all(serde_json::to_string_pretty(data)?.as_bytes())?)
 }
 
 struct CustomPass;
