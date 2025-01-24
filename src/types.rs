@@ -39,3 +39,46 @@ pub fn graph_to_json(path: &Path, data: &Graph<Function, ()>) -> Result<(), Box<
     let mut file = File::create(path)?;
     Ok(file.write_all(serde_json::to_string_pretty(data)?.as_bytes())?)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn insert_new_node_twice() {
+        let mut g = Graph::<_, ()>::new();
+        let fn1_id = get_index_or_insert(
+            &mut g,
+            Function {
+                name: "fn1".to_owned(),
+            },
+        );
+        let fn1_id_bis = get_index_or_insert(
+            &mut g,
+            Function {
+                name: "fn1".to_owned(),
+            },
+        );
+
+        assert_eq!(fn1_id, fn1_id_bis);
+    }
+
+    #[test]
+    fn insert_two_nodes() {
+        let mut g = Graph::<_, ()>::new();
+        let fn1_id = get_index_or_insert(
+            &mut g,
+            Function {
+                name: "fn1".to_owned(),
+            },
+        );
+        let fn2_id = get_index_or_insert(
+            &mut g,
+            Function {
+                name: "fn2".to_owned(),
+            },
+        );
+
+        assert_ne!(fn1_id, fn2_id);
+    }
+}
