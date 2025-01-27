@@ -128,6 +128,24 @@ mod tests {
     }
 
     #[test]
+    fn merge_nodes_with_edge_to_empty() {
+        let mut g = Graph::<_, ()>::new();
+        let n1 = g.add_node(Function {
+            name: "fn1".to_owned(),
+        });
+        let n2 = g.add_node(Function {
+            name: "fn2".to_owned(),
+        });
+        _ = g.add_edge(n1, n2, ());
+
+        let mut g1 = Graph::<_, ()>::new();
+        let mut g2 = g.clone();
+        append_graph(&mut g1, &mut g2).unwrap();
+
+        assert!(graph_eq(&g, &g1));
+    }
+
+    #[test]
     fn merge_two_nodes() {
         let mut g = Graph::<_, ()>::new();
         _ = g.add_node(Function {
