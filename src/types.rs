@@ -167,6 +167,39 @@ mod tests {
 
         assert!(graph_eq(&g, &g1));
     }
+    #[test]
+    fn merge_two_graphs_with_edges_and_common_node() {
+        let mut g = Graph::<_, ()>::new();
+        let fn1 = g.add_node(Function { name: "fn1".into() });
+        let fn2 = g.add_node(Function { name: "fn2".into() });
+        let fn3 = g.add_node(Function { name: "fn3".into() });
+        let fn4 = g.add_node(Function { name: "fn4".into() });
+        let fn5 = g.add_node(Function { name: "fn5".into() });
+        _ = g.add_edge(fn1, fn2, ());
+        _ = g.add_edge(fn1, fn3, ());
+        _ = g.add_edge(fn1, fn4, ());
+        _ = g.add_edge(fn1, fn5, ());
+
+        let mut g123 = Graph::<_, ()>::new();
+        let fn1 = g123.add_node(Function { name: "fn1".into() });
+        let fn2 = g123.add_node(Function { name: "fn2".into() });
+        let fn3 = g123.add_node(Function { name: "fn3".into() });
+        _ = g123.add_edge(fn1, fn2, ());
+        _ = g123.add_edge(fn1, fn3, ());
+
+        let mut g145 = Graph::<_, ()>::new();
+        let fn1 = g145.add_node(Function { name: "fn1".into() });
+        let fn4 = g145.add_node(Function { name: "fn4".into() });
+        let fn5 = g145.add_node(Function { name: "fn5".into() });
+        _ = g145.add_edge(fn1, fn4, ());
+        _ = g145.add_edge(fn1, fn5, ());
+
+        append_graph(&mut g123, &mut g145).unwrap();
+
+        eprintln!("lhs: {:?}", g);
+        eprintln!("rhs: {:?}", g123);
+        assert!(graph_eq(&g, &g123));
+    }
 
     #[test]
     fn insert_new_node_twice() {
