@@ -27,10 +27,13 @@ impl PartialEq for Function {
     }
 }
 
-pub fn get_index_or_insert<E>(graph: &mut Graph<Function, E>, node: Function) -> NodeIndex {
+pub fn get_index_or_insert<N, E>(graph: &mut Graph<N, E>, node: N) -> NodeIndex
+where
+    N: PartialEq,
+{
     graph
         .node_indices()
-        .find(|ix| graph[*ix]== node)
+        .find(|ix| graph[*ix] == node)
         .unwrap_or_else(|| graph.add_node(node))
 }
 
