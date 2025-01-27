@@ -8,7 +8,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Function {
     name: String,
 }
@@ -21,10 +21,16 @@ impl From<values::FunctionValue<'_>> for Function {
     }
 }
 
+impl PartialEq for Function {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
+
 pub fn get_index_or_insert<E>(graph: &mut Graph<Function, E>, node: Function) -> NodeIndex {
     graph
         .node_indices()
-        .find(|ix| graph[*ix].name == node.name)
+        .find(|ix| graph[*ix]== node)
         .unwrap_or_else(|| graph.add_node(node))
 }
 
