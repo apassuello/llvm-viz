@@ -1,5 +1,5 @@
 use llvm_plugin::inkwell::values;
-use petgraph::graph::NodeIndex;
+use petgraph::graph::{EdgeIndex, NodeIndex};
 use petgraph::Graph;
 use serde::{Deserialize, Serialize};
 
@@ -27,9 +27,15 @@ impl PartialEq for Function {
     }
 }
 
-pub fn get_index_or_insert_node<N, E>(graph: &mut Graph<N, E>, node: N) -> NodeIndex
+pub fn get_index_or_insert_node<N, E, Ty, Ix>(
+    graph: &mut Graph<N, E, Ty, Ix>,
+    node: N,
+) -> NodeIndex<Ix>
 where
     N: PartialEq,
+    E: PartialEq,
+    Ty: petgraph::EdgeType,
+    Ix: petgraph::graph::IndexType + PartialEq,
 {
     graph
         .node_indices()
@@ -37,10 +43,47 @@ where
         .unwrap_or_else(|| graph.add_node(node))
 }
 
-pub fn append_graph<E>(
-    source: &mut Graph<Function, E>,
-    dest: &mut Graph<Function, E>,
-) -> Result<(), Box<dyn Error>> {
+pub fn get_index_or_insert_edge<N, E, Ty, Ix>(
+    graph: &mut Graph<N, E, Ty, Ix>,
+    a: N,
+    b: N,
+    edge: E,
+) -> EdgeIndex<Ix>
+where
+    N: PartialEq,
+    E: PartialEq,
+    Ty: petgraph::EdgeType,
+    Ix: petgraph::graph::IndexType + PartialEq,
+{
+    let a = get_index_or_insert_node(graph, a);
+    let b = get_index_or_insert_node(graph, b);
+
+    graph
+        .find_edge(a, b)
+        .unwrap_or_else(|| graph.add_edge(a, b, edge))
+}
+
+pub fn append_graph<N, E, Ty, Ix>(
+    dest: &mut Graph<N, E, Ty, Ix>,
+    source: &mut Graph<N, E, Ty, Ix>,
+) -> Result<(), Box<dyn Error>>
+where
+    N: PartialEq + Clone,
+    E: PartialEq + Clone,
+    Ty: petgraph::EdgeType,
+    Ix: petgraph::graph::IndexType + PartialEq,
+{
+    for n in source.raw_nodes() {
+        _ = get_index_or_insert_node(dest, n.weight.clone());
+    }
+    for n in source.raw_edges() {
+        _ = get_index_or_insert_edge(
+            dest,
+            source[n.source()].clone(),
+            source[n.target()].clone(),
+            n.weight.clone(),
+        );
+    }
     Ok(())
 }
 
