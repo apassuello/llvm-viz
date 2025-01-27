@@ -27,7 +27,7 @@ impl PartialEq for Function {
     }
 }
 
-pub fn get_index_or_insert<N, E>(graph: &mut Graph<N, E>, node: N) -> NodeIndex
+pub fn get_index_or_insert_node<N, E>(graph: &mut Graph<N, E>, node: N) -> NodeIndex
 where
     N: PartialEq,
 {
@@ -110,13 +110,13 @@ mod tests {
     #[test]
     fn insert_new_node_twice() {
         let mut g = Graph::<_, ()>::new();
-        let fn1_id = get_index_or_insert(
+        let fn1_id = get_index_or_insert_node(
             &mut g,
             Function {
                 name: "fn1".to_owned(),
             },
         );
-        let fn1_id_bis = get_index_or_insert(
+        let fn1_id_bis = get_index_or_insert_node(
             &mut g,
             Function {
                 name: "fn1".to_owned(),
@@ -129,13 +129,13 @@ mod tests {
     #[test]
     fn insert_two_nodes() {
         let mut g = Graph::<_, ()>::new();
-        let fn1_id = get_index_or_insert(
+        let fn1_id = get_index_or_insert_node(
             &mut g,
             Function {
                 name: "fn1".to_owned(),
             },
         );
-        let fn2_id = get_index_or_insert(
+        let fn2_id = get_index_or_insert_node(
             &mut g,
             Function {
                 name: "fn2".to_owned(),
