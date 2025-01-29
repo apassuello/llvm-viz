@@ -10,7 +10,7 @@ use std::path::Path;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Function {
-    name: String,
+    pub name: String,
 }
 
 impl From<values::FunctionValue<'_>> for Function {
