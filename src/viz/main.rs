@@ -13,6 +13,7 @@ fn main() {
     let nodes: Vec<_> = g
         .raw_nodes()
         .iter()
+        // todo: Dont stack boxes
         .map(|n| (n.weight.name.clone(), [100.0, 100.0, 100.0, 100.0]))
         .collect();
 
@@ -26,6 +27,7 @@ fn main() {
             clear([1.0; 4], g);
 
             for node in nodes.clone() {
+                // todo: Also display node's name
                 rectangle([0.5, 0.7, 0.0, 1.0], node.1, c.transform, g);
             }
         });
