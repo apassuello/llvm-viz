@@ -167,6 +167,7 @@ mod tests {
 
         assert!(graph_eq(&g, &g1));
     }
+
     #[test]
     fn merge_two_graphs_with_edges_and_common_node() {
         let mut g = Graph::<_, ()>::new();
