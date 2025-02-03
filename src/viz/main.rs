@@ -19,10 +19,10 @@ fn main() {
     let nodes: Vec<_> = g
         .raw_nodes()
         .iter()
-        // todo: Dont stack boxes
-        .map(|n| Rectangle {
+        .enumerate()
+        .map(|(i, n)| Rectangle {
             name: n.weight.name.clone(),
-            coords: [100.0, 100.0, 100.0, 100.0],
+            coords: [i as f64 * 150.0 + 50 as f64, 100.0, 100.0, 100.0],
         })
         .collect();
 
