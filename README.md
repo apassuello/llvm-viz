@@ -27,3 +27,13 @@ opt --load-pass-plugin=target/debug/libllvm_viz.so --passes=hello-world -disable
 ```bash
 cargo r --bin viz
 ```
+
+## Troubleshooting
+
+In case of error from wgpu looking like this:
+`The selected version doesn't support Features(DYNAMIC_ARRAY_SIZE)`
+
+Export this:
+```
+export WGPU_BACKEND=vulkan
+```

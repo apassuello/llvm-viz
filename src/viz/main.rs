@@ -37,6 +37,7 @@ fn greet_rectantles(query: Query<&Rectangle>) {
 
 fn main() {
     App::new()
+        .add_plugins(DefaultPlugins)
         .add_systems(Startup, add_rectangles)
         .add_systems(Update, greet_rectantles)
         .run();
