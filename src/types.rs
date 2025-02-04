@@ -13,7 +13,15 @@ pub struct Function {
     pub name: String,
     pub source_file: Option<String>,
 }
-
+    /// Brief
+    /// 
+    /// More...
+    /// ```rust
+    /// use crate::llvm_viz::types::{Function, FunctionBuilder};
+    /// 
+    /// let f = FunctionBuilder::new("toto").build();
+    /// assert_eq!(f, Function{name: "toto".to_owned(), source_file: None});
+    /// ```
 pub struct FunctionBuilder {
     pub name: String,
     pub source_file: Option<String>,
@@ -26,6 +34,7 @@ impl FunctionBuilder {
             source_file : None
         }
     }
+
 
     pub fn build(self) -> Function {
         Function {
@@ -159,12 +168,8 @@ mod tests {
     #[test]
     fn merge_nodes_with_edge_to_empty() {
         let mut g = Graph::<_, ()>::new();
-        let n1 = g.add_node(Function {
-            name: "fn1".to_owned(),
-        });
-        let n2 = g.add_node(Function {
-            name: "fn2".to_owned(),
-        });
+        let n1 = g.add_node(FunctionBuilder::new("fn1").build());
+        let n2 = g.add_node(FunctionBuilder::new("fn2").build());
         _ = g.add_edge(n1, n2, ());
 
         let mut g1 = Graph::<_, ()>::new();
@@ -177,21 +182,13 @@ mod tests {
     #[test]
     fn merge_two_nodes() {
         let mut g = Graph::<_, ()>::new();
-        _ = g.add_node(Function {
-            name: "fn1".to_owned(),
-        });
-        _ = g.add_node(Function {
-            name: "fn2".to_owned(),
-        });
+        _ = g.add_node(FunctionBuilder::new("fn1").build());
+        _ = g.add_node(FunctionBuilder::new("fn2").build());
 
         let mut g1 = Graph::<_, ()>::new();
-        _ = g1.add_node(Function {
-            name: "fn1".to_owned(),
-        });
+        _ = g1.add_node(FunctionBuilder::new("fn1").build());
         let mut g2 = Graph::<_, ()>::new();
-        _ = g2.add_node(Function {
-            name: "fn2".to_owned(),
-        });
+        _ = g2.add_node(FunctionBuilder::new("fn2").build());
         append_graph(&mut g1, &mut g2).unwrap();
 
         assert!(graph_eq(&g, &g1));
@@ -200,27 +197,27 @@ mod tests {
     #[test]
     fn merge_two_graphs_with_edges_and_common_node() {
         let mut g = Graph::<_, ()>::new();
-        let fn1 = g.add_node(Function { name: "fn1".into() });
-        let fn2 = g.add_node(Function { name: "fn2".into() });
-        let fn3 = g.add_node(Function { name: "fn3".into() });
-        let fn4 = g.add_node(Function { name: "fn4".into() });
-        let fn5 = g.add_node(Function { name: "fn5".into() });
+        let fn1 = g.add_node(FunctionBuilder::new("fn1").build());
+        let fn2 = g.add_node(FunctionBuilder::new("fn2").build());
+        let fn3 = g.add_node(FunctionBuilder::new("fn3").build());
+        let fn4 = g.add_node(FunctionBuilder::new("fn4").build());
+        let fn5 = g.add_node(FunctionBuilder::new("fn5").build());
         _ = g.add_edge(fn1, fn2, ());
         _ = g.add_edge(fn1, fn3, ());
         _ = g.add_edge(fn1, fn4, ());
         _ = g.add_edge(fn1, fn5, ());
 
         let mut g123 = Graph::<_, ()>::new();
-        let fn1 = g123.add_node(Function { name: "fn1".into() });
-        let fn2 = g123.add_node(Function { name: "fn2".into() });
-        let fn3 = g123.add_node(Function { name: "fn3".into() });
+        let fn1 = g123.add_node(FunctionBuilder::new("fn1").build());
+        let fn2 = g123.add_node(FunctionBuilder::new("fn2").build());
+        let fn3 = g123.add_node(FunctionBuilder::new("fn3").build());
         _ = g123.add_edge(fn1, fn2, ());
         _ = g123.add_edge(fn1, fn3, ());
 
         let mut g145 = Graph::<_, ()>::new();
-        let fn1 = g145.add_node(Function { name: "fn1".into() });
-        let fn4 = g145.add_node(Function { name: "fn4".into() });
-        let fn5 = g145.add_node(Function { name: "fn5".into() });
+        let fn1 = g145.add_node(FunctionBuilder::new("fn1").build());
+        let fn4 = g145.add_node(FunctionBuilder::new("fn4").build());
+        let fn5 = g145.add_node(FunctionBuilder::new("fn5").build());
         _ = g145.add_edge(fn1, fn4, ());
         _ = g145.add_edge(fn1, fn5, ());
 
@@ -236,15 +233,11 @@ mod tests {
         let mut g = Graph::<_, ()>::new();
         let fn1_id = get_index_or_insert_node(
             &mut g,
-            Function {
-                name: "fn1".to_owned(),
-            },
+            FunctionBuilder::new("fn1").build(),
         );
         let fn1_id_bis = get_index_or_insert_node(
             &mut g,
-            Function {
-                name: "fn1".to_owned(),
-            },
+            FunctionBuilder::new("fn1").build(),
         );
 
         assert_eq!(fn1_id, fn1_id_bis);
@@ -255,15 +248,11 @@ mod tests {
         let mut g = Graph::<_, ()>::new();
         let fn1_id = get_index_or_insert_node(
             &mut g,
-            Function {
-                name: "fn1".to_owned(),
-            },
+            FunctionBuilder::new("fn1").build(),
         );
         let fn2_id = get_index_or_insert_node(
             &mut g,
-            Function {
-                name: "fn2".to_owned(),
-            },
+            FunctionBuilder::new("fn2").build(),
         );
 
         assert_ne!(fn1_id, fn2_id);
