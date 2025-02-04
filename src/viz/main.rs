@@ -35,10 +35,18 @@ fn greet_rectantles(query: Query<&Rectangle>) {
     }
 }
 
+pub struct LlvmVizPlugin;
+
+impl Plugin for LlvmVizPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, add_rectangles);
+        app.add_systems(Update, greet_rectantles);
+    }
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, add_rectangles)
-        .add_systems(Update, greet_rectantles)
+        .add_plugins(LlvmVizPlugin)
         .run();
 }
