@@ -11,12 +11,41 @@ use std::path::Path;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Function {
     pub name: String,
+    pub source_file: Option<String>,
+}
+
+pub struct FunctionBuilder {
+    pub name: String,
+    pub source_file: Option<String>,
+}
+
+impl FunctionBuilder {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_owned(),
+            source_file : None
+        }
+    }
+
+    pub fn build(self) -> Function {
+        Function {
+            name: self.name,
+            source_file : self.source_file
+        }
+    }
+
+    pub fn source_file(&mut self, source_file: &str) -> &mut Self {
+        let new = self;
+        new.source_file = Some(source_file.to_owned());
+        new
+    }
 }
 
 impl From<values::FunctionValue<'_>> for Function {
     fn from(item: values::FunctionValue) -> Self {
         Self {
             name: item.get_name().to_str().expect("").into(),
+            source_file: None
         }
     }
 }
