@@ -11,6 +11,7 @@ use llvm_plugin::{
 
 use petgraph::dot::{Config, Dot};
 use petgraph::Graph;
+use types::FunctionBuilder;
 
 pub mod types;
 
@@ -30,7 +31,7 @@ struct CustomPass;
 impl LlvmModulePass for CustomPass {
     fn run_pass(&self, module: &mut Module, _manager: &ModuleAnalysisManager) -> PreservedAnalyses {
         let mut omega_tree = Graph::<types::Function, ()>::new();
-
+        let module_name = module.get_name().to_str().expect("");
         for function in module.get_functions() {
             /* Equivalent code in C++
 
@@ -44,8 +45,12 @@ impl LlvmModulePass for CustomPass {
                    }
                }
             */
-
-            let current_function = types::get_index_or_insert_node(&mut omega_tree, function.into());
+            let mut fb = FunctionBuilder::new(function.get_name().to_str().expect(""));
+            
+            if function.get_basic_blocks().iter().count() > 0 {
+                fb.source_file(module_name);
+            }
+            let current_function = types::get_index_or_insert_node(&mut omega_tree, fb.build());
 
             for basic_block in function.get_basic_blocks() {
                 for instruction in basic_block.get_instructions() {
