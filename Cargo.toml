@@ -11,6 +11,7 @@ name = "viz"
 path = "src/viz/main.rs"
 
 [dependencies]
+bevy = "0.15.1"
 llvm-plugin = { version = "0.6.0", features = ["llvm18-0"] }
 petgraph = { version = "0.7.1", features = ["serde-1"] }
 serde = { version = "1.0.217", features = ["derive"] }
