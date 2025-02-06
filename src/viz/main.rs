@@ -28,16 +28,18 @@ fn setup_player(
 
     // TODO: Add name
     for (i, node) in g.raw_nodes().iter().enumerate() {
-        commands.spawn((
-            Player,
-            Mesh2d(meshes.add(Rectangle::new(100., 30.))),
-            MeshMaterial2d(materials.add(Color::hsv(
-                360. * (i as f32) / g.raw_nodes().iter().count() as f32,
-                1.,
-                1.,
-            ))),
-            Transform::from_xyz(150. * i as f32, 0., 2.),
-        ));
+        commands
+            .spawn((
+                Player,
+                Mesh2d(meshes.add(Rectangle::new(100., 30.))),
+                MeshMaterial2d(materials.add(Color::hsv(
+                    360. * (i as f32) / g.raw_nodes().iter().count() as f32,
+                    1.,
+                    1.,
+                ))),
+                Transform::from_xyz(150. * i as f32, 0., 2.),
+            ))
+            .with_child(Text2d::new(node.weight.name.clone()));
     }
 }
 
