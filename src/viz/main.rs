@@ -1,3 +1,4 @@
+use bevy::dev_tools::fps_overlay::FpsOverlayPlugin;
 use bevy::prelude::*;
 use petgraph::dot::{Config, Dot};
 
@@ -5,48 +6,32 @@ use std::path::Path;
 
 use llvm_viz::types;
 
-#[derive(Debug, Clone, Component)]
-struct Rectangle {
-    name: String,
-    coords: [f64; 4],
-}
-
-fn add_rectangles(mut commands: Commands) {
-    let g = types::graph_from_json(Path::new("omega_tree.json")).expect("");
-    println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
-
-    for r in g
-        .raw_nodes()
-        .iter()
-        .enumerate()
-        .map(|(i, n)| Rectangle {
-            name: n.weight.name.clone(),
-            coords: [i as f64 * 150.0 + 50 as f64, 100.0, 100.0, 100.0],
-        })
-        .collect::<Vec<_>>()
-    {
-        commands.spawn(r);
-    }
-}
-
-fn greet_rectantles(query: Query<&Rectangle>) {
-    for rectangle in &query {
-        println!("hello {}!", rectangle.name);
-    }
-}
-
-pub struct LlvmVizPlugin;
-
-impl Plugin for LlvmVizPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Startup, add_rectangles);
-        app.add_systems(Update, greet_rectantles);
-    }
-}
+#[derive(Component)]
+struct Player;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(LlvmVizPlugin)
+        .add_plugins(FpsOverlayPlugin::default())
+        .add_systems(Startup, (setup_scene, setup_camera))
+        // .add_systems(Update, (move_player, update_camera).chain())
         .run();
+}
+
+fn setup_scene(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    // Player
+    commands.spawn((
+        Player,
+        Mesh2d(meshes.add(Rectangle::new(100., 30.))),
+        MeshMaterial2d(materials.add(Color::srgb(1., 1., 1.))),
+        // Transform::from_xyz(0., 0., 2.),
+    ));
+}
+
+fn setup_camera(mut commands: Commands) {
+    commands.spawn((Camera2d, Camera::default()));
 }
