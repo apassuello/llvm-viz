@@ -26,10 +26,12 @@ fn setup_player(
     let g = types::graph_from_json(Path::new("omega_tree.json")).expect("");
     println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
 
+    // TODO: Add name
     for (i, node) in g.raw_nodes().iter().enumerate() {
         commands.spawn((
             Player,
             Mesh2d(meshes.add(Rectangle::new(100., 30.))),
+            // TODO: Normalize color
             MeshMaterial2d(materials.add(Color::hsv(i as f32, 1., 1.))),
             Transform::from_xyz(150. * i as f32, 0., 2.),
         ));
