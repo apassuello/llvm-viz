@@ -23,13 +23,17 @@ fn setup_player(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    // Player
-    commands.spawn((
-        Player,
-        Mesh2d(meshes.add(Rectangle::new(100., 30.))),
-        MeshMaterial2d(materials.add(Color::srgb(1., 1., 1.))),
-        Transform::from_xyz(0., 0., 2.),
-    ));
+    let g = types::graph_from_json(Path::new("omega_tree.json")).expect("");
+    println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
+
+    for (i, node) in g.raw_nodes().iter().enumerate() {
+        commands.spawn((
+            Player,
+            Mesh2d(meshes.add(Rectangle::new(100., 30.))),
+            MeshMaterial2d(materials.add(Color::hsv(i as f32, 1., 1.))),
+            Transform::from_xyz(150. * i as f32, 0., 2.),
+        ));
+    }
 }
 
 fn setup_camera(mut commands: Commands) {
