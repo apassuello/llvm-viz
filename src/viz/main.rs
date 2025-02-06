@@ -31,8 +31,11 @@ fn setup_player(
         commands.spawn((
             Player,
             Mesh2d(meshes.add(Rectangle::new(100., 30.))),
-            // TODO: Normalize color
-            MeshMaterial2d(materials.add(Color::hsv(i as f32, 1., 1.))),
+            MeshMaterial2d(materials.add(Color::hsv(
+                360. * (i as f32) / g.raw_nodes().iter().count() as f32,
+                1.,
+                1.,
+            ))),
             Transform::from_xyz(150. * i as f32, 0., 2.),
         ));
     }
