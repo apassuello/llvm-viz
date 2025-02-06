@@ -6,7 +6,7 @@
 # Your platform. See PLATS for possible values.
 PLAT= guess
 
-CC= gcc -std=gnu99
+CC= clang -std=gnu99
 CFLAGS= -O2 -Wall -Wextra -DLUA_COMPAT_5_3 $(SYSCFLAGS) $(MYCFLAGS)
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
@@ -46,11 +46,22 @@ LUAC_O=	luac.o
 ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
 ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
 ALL_A= $(LUA_A)
+ALL_LL= $(ALL_O:.o=.ll)
+
+SOURCES = $(ALL_O:.o=.c)
+LL_FILES = $(SOURCES:.c=.ll)
+
+# Pattern rules
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+%.ll: %.c
+	$(CC) $(CFLAGS) -S -emit-llvm -o $@ $<
 
 # Targets start here.
 default: $(PLAT)
 
-all:	$(ALL_T)
+all:	$(ALL_T) $(LL_FILES)
 
 o:	$(ALL_O)
 
@@ -70,7 +81,7 @@ test:
 	./$(LUA_T) -v
 
 clean:
-	$(RM) $(ALL_T) $(ALL_O)
+	$(RM) $(ALL_T) $(ALL_O) $(LL_FILES)
 
 depend:
 	@$(CC) $(CFLAGS) -MM l*.c

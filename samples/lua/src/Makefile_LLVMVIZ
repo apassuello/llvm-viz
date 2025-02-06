@@ -48,15 +48,20 @@ ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
 ALL_A= $(LUA_A)
 ALL_LL= $(ALL_O:.o=.ll)
 
+SOURCES = $(ALL_O:.o=.c)
+LL_FILES = $(SOURCES:.c=.ll)
 
 # Pattern rules
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
-	$(CC) $(CFLAGS) -S -emit-llvm -o $(@:.o=.ll) $<
+
+%.ll: %.c
+	$(CC) $(CFLAGS) -S -emit-llvm -o $@ $<
+
 # Targets start here.
 default: $(PLAT)
 
-all:	$(ALL_T)
+all:	$(ALL_T) $(LL_FILES)
 
 o:	$(ALL_O)
 
@@ -76,7 +81,7 @@ test:
 	./$(LUA_T) -v
 
 clean:
-	$(RM) $(ALL_T) $(ALL_O)
+	$(RM) $(ALL_T) $(ALL_O) $(LL_FILES)
 
 depend:
 	@$(CC) $(CFLAGS) -MM l*.c
