@@ -26,7 +26,6 @@ fn setup_player(
     let g = types::graph_from_json(Path::new("omega_tree.json")).expect("");
     println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
 
-    // TODO: Add name
     for (i, node) in g.raw_nodes().iter().enumerate() {
         commands
             .spawn((
