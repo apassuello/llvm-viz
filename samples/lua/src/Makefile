@@ -6,7 +6,7 @@
 # Your platform. See PLATS for possible values.
 PLAT= guess
 
-CC= clang -std=gnu99
+CC= clang-18 -std=gnu99
 CFLAGS= -O2 -Wall -Wextra -DLUA_COMPAT_5_3 $(SYSCFLAGS) $(MYCFLAGS)
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
@@ -66,6 +66,11 @@ all:	$(ALL_T) $(LL_FILES)
 o:	$(ALL_O)
 
 a:	$(ALL_A)
+
+analyze: $(LL_FILES)
+	for file in $(LL_FILES); do \
+		opt --load-pass-plugin=target/debug/libllvm_viz.so --passes=hello-world -disable-output $$file; \
+	done
 
 $(LUA_A): $(BASE_O)
 	$(AR) $@ $(BASE_O)
