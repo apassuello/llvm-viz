@@ -30,7 +30,17 @@ fn plugin_registrar(builder: &mut PassBuilder) {
 struct CustomPass;
 impl LlvmModulePass for CustomPass {
     fn run_pass(&self, module: &mut Module, _manager: &ModuleAnalysisManager) -> PreservedAnalyses {
-        let mut omega_tree = Graph::<types::Function, ()>::new();
+        let json_path = Path::new("omega_tree.json");
+        
+        // Load or create graph
+        let mut omega_tree = if json_path.exists() {
+            types::graph_from_json(json_path).expect("Failed to load existing graph")
+        } else {
+            Graph::<types::Function, ()>::new()
+        };
+        //let mut omega_tree = Graph::<types::Function, ()>::new();
+        let mut module_graph = Graph::<types::Function, ()>::new();
+
         let module_name = module.get_name().to_str().expect("");
         for function in module.get_functions() {
             /* Equivalent code in C++
@@ -68,8 +78,10 @@ impl LlvmModulePass for CustomPass {
             "{:?}",
             Dot::with_config(&omega_tree, &[Config::EdgeNoLabel])
         );
+        //let json_filename = format!("{}.json", module_name);
+        types::append_graph(&mut omega_tree, &mut module_graph);
 
-        types::graph_to_json(Path::new("omega_tree.json"), &omega_tree)
+        types::graph_to_json(Path::new(json_path), &omega_tree)
             .expect("Could not Serialize `omega_tree` to file");
 
         PreservedAnalyses::All
