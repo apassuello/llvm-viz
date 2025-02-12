@@ -4,7 +4,7 @@
 use std::path::Path;
 
 use llvm_plugin::inkwell::module::Module;
-use llvm_plugin::inkwell::values::CallSiteValue;
+use llvm_plugin::inkwell::values::{AnyValue, CallSiteValue};
 use llvm_plugin::{
     LlvmModulePass, ModuleAnalysisManager, PassBuilder, PipelineParsing, PreservedAnalyses,
 };
@@ -64,11 +64,13 @@ impl LlvmModulePass for CustomPass {
             for basic_block in function.get_basic_blocks() {
                 for instruction in basic_block.get_instructions() {
                     if let Ok(call_site_value) = CallSiteValue::try_from(instruction) {
-                        let callee = types::get_index_or_insert_node(
-                            &mut omega_tree,
-                            call_site_value.get_called_fn_value().into(),
-                        );
-                        omega_tree.add_edge(current_function, callee, ());
+                        if call_site_value.as_any_value_enum().is_function_value() {
+                            let callee = types::get_index_or_insert_node(
+                                &mut omega_tree,
+                                call_site_value.get_called_fn_value().into(),
+                            );
+                            omega_tree.add_edge(current_function, callee, ());
+                        }
                     }
                 }
             }
