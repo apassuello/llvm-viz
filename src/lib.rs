@@ -56,8 +56,8 @@ impl LlvmModulePass for CustomPass {
                }
             */
             let mut fb = FunctionBuilder::new(function.get_name().to_str().expect(""));
-            
-            if !function.get_basic_blocks().is_empty() {
+
+            if !function.is_null() {
                 fb.source_file(module_name);
             }
             let current_function = types::get_index_or_insert_node(&mut omega_tree, fb.build());
