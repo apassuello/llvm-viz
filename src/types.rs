@@ -8,7 +8,9 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+use bevy::prelude::*;
+
+#[derive(Debug, Clone, Serialize, Deserialize, Component)]
 pub struct Function {
     pub name: String,
     pub source_file: Option<String>,
