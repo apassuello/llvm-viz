@@ -28,7 +28,7 @@ fn setup_player(
     println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
 
     let num_nodes = g.raw_nodes().len();
-    let rect_width = 100.0; // Width of each rectangle
+    let rect_width = 300.0; // Width of each rectangle
     let rect_height = 30.0; // Height of each rectangle
     let spacing_x = 50.0; // Horizontal spacing between rectangles
     let spacing_y = 20.0; // Vertical spacing between rows
@@ -46,7 +46,7 @@ fn setup_player(
         commands
             .spawn((
                 Player,
-                Mesh2d(meshes.add(Rectangle::new(100., 30.))),
+                Mesh2d(meshes.add(Rectangle::new(rect_width, rect_height))),
                 MeshMaterial2d(materials.add(Color::hsv(
                     360. * (i as f32) / num_nodes as f32,
                     1.,
