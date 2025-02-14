@@ -15,15 +15,15 @@ pub struct Function {
     pub name: String,
     pub source_file: Option<String>,
 }
-    /// Brief
-    /// 
-    /// More...
-    /// ```rust
-    /// use crate::llvm_viz::types::{Function, FunctionBuilder};
-    /// 
-    /// let f = FunctionBuilder::new("toto").build();
-    /// assert_eq!(f, Function{name: "toto".to_owned(), source_file: None});
-    /// ```
+/// Brief
+///
+/// More...
+/// ```rust
+/// use crate::llvm_viz::types::{Function, FunctionBuilder};
+///
+/// let f = FunctionBuilder::new("toto").build();
+/// assert_eq!(f, Function{name: "toto".to_owned(), source_file: None});
+/// ```
 pub struct FunctionBuilder {
     pub name: String,
     pub source_file: Option<String>,
@@ -33,15 +33,14 @@ impl FunctionBuilder {
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_owned(),
-            source_file : None
+            source_file: None,
         }
     }
-
 
     pub fn build(self) -> Function {
         Function {
             name: self.name,
-            source_file : self.source_file
+            source_file: self.source_file,
         }
     }
 
@@ -56,7 +55,7 @@ impl From<values::FunctionValue<'_>> for Function {
     fn from(item: values::FunctionValue) -> Self {
         Self {
             name: item.get_name().to_str().expect("").into(),
-            source_file: None
+            source_file: None,
         }
     }
 }
@@ -233,14 +232,8 @@ mod tests {
     #[test]
     fn insert_new_node_twice() {
         let mut g = Graph::<_, ()>::new();
-        let fn1_id = get_index_or_insert_node(
-            &mut g,
-            FunctionBuilder::new("fn1").build(),
-        );
-        let fn1_id_bis = get_index_or_insert_node(
-            &mut g,
-            FunctionBuilder::new("fn1").build(),
-        );
+        let fn1_id = get_index_or_insert_node(&mut g, FunctionBuilder::new("fn1").build());
+        let fn1_id_bis = get_index_or_insert_node(&mut g, FunctionBuilder::new("fn1").build());
 
         assert_eq!(fn1_id, fn1_id_bis);
     }
@@ -248,14 +241,8 @@ mod tests {
     #[test]
     fn insert_two_nodes() {
         let mut g = Graph::<_, ()>::new();
-        let fn1_id = get_index_or_insert_node(
-            &mut g,
-            FunctionBuilder::new("fn1").build(),
-        );
-        let fn2_id = get_index_or_insert_node(
-            &mut g,
-            FunctionBuilder::new("fn2").build(),
-        );
+        let fn1_id = get_index_or_insert_node(&mut g, FunctionBuilder::new("fn1").build());
+        let fn2_id = get_index_or_insert_node(&mut g, FunctionBuilder::new("fn2").build());
 
         assert_ne!(fn1_id, fn2_id);
     }
