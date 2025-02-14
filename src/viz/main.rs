@@ -91,6 +91,6 @@ fn move_camera(
         direction.x += 1.;
     }
 
-    let move_delta = direction.normalize_or_zero();
+    let move_delta = direction.normalize_or_zero() * 10.;
     camera.translation += move_delta.extend(0.);
 }
