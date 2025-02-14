@@ -2629,6 +2629,7 @@ name = "llvm-viz"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_gizmos",
  "bevy_pancam",
  "llvm-plugin",
  "petgraph 0.7.1",
