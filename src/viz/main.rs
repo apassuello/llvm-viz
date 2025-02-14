@@ -8,7 +8,7 @@ use std::path::Path;
 use llvm_viz::types;
 
 #[derive(Component)]
-struct Player;
+struct Node;
 
 fn main() {
     App::new()
@@ -42,23 +42,29 @@ fn setup_player(
     let total_width = (RECT_WIDTH + SPACING_X) * (num_columns as f32) - SPACING_X;
     let total_height = (RECT_HEIGHT + SPACING_Y) * (num_columns as f32) - SPACING_Y;
 
+    let mut nodes_indices = Vec::new();
+
     for (i, node) in g.raw_nodes().iter().enumerate() {
-        commands
-            .spawn((
-                Player,
-                Mesh2d(meshes.add(Rectangle::new(RECT_WIDTH, RECT_HEIGHT))),
-                MeshMaterial2d(materials.add(Color::hsv(
-                    360. * (i as f32) / num_nodes as f32,
-                    1.,
-                    1.,
-                ))),
-                Transform::from_xyz(
-                    (-total_width / 2.0) + (i % num_columns) as f32 * box_width,
-                    (total_height / 2.0) - ((i / num_columns) as f32 * box_height),
-                    2.,
-                ),
-            ))
-            .with_child(Text2d::new(node.weight.name.clone()));
+        nodes_indices.push(
+            commands
+                .spawn((
+                    Node,
+                    node.weight.clone(),
+                    Mesh2d(meshes.add(Rectangle::new(RECT_WIDTH, RECT_HEIGHT))),
+                    MeshMaterial2d(materials.add(Color::hsv(
+                        360. * (i as f32) / num_nodes as f32,
+                        1.,
+                        1.,
+                    ))),
+                    Transform::from_xyz(
+                        (-total_width / 2.0) + (i % num_columns) as f32 * box_width,
+                        (total_height / 2.0) - ((i / num_columns) as f32 * box_height),
+                        2.,
+                    ),
+                ))
+                .with_child(Text2d::new(node.weight.name.clone()))
+                .id(),
+        );
     }
 }
 
