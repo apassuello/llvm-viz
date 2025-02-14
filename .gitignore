@@ -1,3 +1,10 @@
 /target
+
 /samples/*/*.ll
+/samples/*/*/*.ll
+/samples/*/*/*.o
+/samples/*/*/lua
+/samples/*/*/luac
+/samples/*/*/liblua.a
+
 omega_tree.json
