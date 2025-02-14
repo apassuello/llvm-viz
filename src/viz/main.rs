@@ -10,12 +10,22 @@ use llvm_viz::types;
 #[derive(Component)]
 struct Node;
 
+#[derive(Component)]
+struct Edge;
+
+#[derive(Component)]
+struct Source(Entity);
+
+#[derive(Component)]
+struct Target(Entity);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FpsOverlayPlugin::default())
         .add_plugins(PanCamPlugin)
         .add_systems(Startup, (setup_player, setup_camera))
+        .add_systems(Update, draw_edges)
         .run();
 }
 
@@ -66,8 +76,31 @@ fn setup_player(
                 .id(),
         );
     }
+
+    for (i, edge) in g.raw_edges().iter().enumerate() {
+        commands.spawn((
+            Edge,
+            Source(nodes_indices[edge.source().index()]),
+            Target(nodes_indices[edge.target().index()]),
+            // node.weight.clone(),
+            Transform::from_xyz(
+                (-total_width / 2.0) + (i % num_columns) as f32 * box_width,
+                (total_height / 2.0) - ((i / num_columns) as f32 * box_height),
+                2.,
+            ),
+        ));
+    }
 }
 
 fn setup_camera(mut commands: Commands) {
     commands.spawn((Camera2d, PanCam::default()));
+}
+
+fn draw_edges(mut gizmos: Gizmos, query: Query<(&Transform, &Source, &Target), With<Edge>>) {
+    for (_t, Source(source), Target(target)) in &query {
+        //TODO: Draw arrow
+        let s = todo!();
+        let t = todo!();
+        gizmos.arrow_2d(s, t, Color::srgb(0., 1., 0.));
+    }
 }
