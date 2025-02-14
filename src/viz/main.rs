@@ -28,25 +28,25 @@ fn setup_player(
     println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
 
     let num_nodes = g.raw_nodes().len();
-    let rect_width = 300.0; // Width of each rectangle
-    let rect_height = 30.0; // Height of each rectangle
-    let spacing_x = 50.0; // Horizontal spacing between rectangles
-    let spacing_y = 20.0; // Vertical spacing between rows
+    const RECT_WIDTH: f32 = 300.0; // Width of each rectangle
+    const RECT_HEIGHT: f32 = 30.0; // Height of each rectangle
+    const SPACING_X: f32 = 50.0; // Horizontal spacing between rectangles
+    const SPACING_Y: f32 = 20.0; // Vertical spacing between rows
 
     // Calculate the optimal number of columns
     // We'll aim for a roughly square layout
     let num_columns = (num_nodes as f32).sqrt().ceil() as usize;
-    let box_width = rect_width + spacing_x;
-    let box_height = rect_height + spacing_y;
+    let box_width = RECT_WIDTH + SPACING_X;
+    let box_height = RECT_HEIGHT + SPACING_Y;
 
-    let total_width = (rect_width + spacing_x) * (num_columns as f32) - spacing_x;
-    let total_height = (rect_height + spacing_y) * (num_columns as f32) - spacing_y;
+    let total_width = (RECT_WIDTH + SPACING_X) * (num_columns as f32) - SPACING_X;
+    let total_height = (RECT_HEIGHT + SPACING_Y) * (num_columns as f32) - SPACING_Y;
 
     for (i, node) in g.raw_nodes().iter().enumerate() {
         commands
             .spawn((
                 Player,
-                Mesh2d(meshes.add(Rectangle::new(rect_width, rect_height))),
+                Mesh2d(meshes.add(Rectangle::new(RECT_WIDTH, RECT_HEIGHT))),
                 MeshMaterial2d(materials.add(Color::hsv(
                     360. * (i as f32) / num_nodes as f32,
                     1.,
