@@ -1,5 +1,6 @@
 use bevy::dev_tools::fps_overlay::FpsOverlayPlugin;
 use bevy::prelude::*;
+use bevy_pancam::{PanCam, PanCamPlugin};
 use petgraph::dot::{Config, Dot};
 
 use std::path::Path;
@@ -13,6 +14,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(FpsOverlayPlugin::default())
+        .add_plugins(PanCamPlugin)
         .add_systems(Startup, (setup_player, setup_camera))
         .add_systems(Update, move_camera)
         .run();
@@ -62,7 +64,7 @@ fn setup_player(
 }
 
 fn setup_camera(mut commands: Commands) {
-    commands.spawn((Camera2d, Camera::default()));
+    commands.spawn((Camera2d, PanCam::default()));
 }
 
 fn move_camera(
