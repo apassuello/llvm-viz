@@ -27,10 +27,10 @@ fn setup_player(
     println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
 
     let num_nodes = g.raw_nodes().len();
-    let rect_width = 100.0;  // Width of each rectangle
-    let rect_height = 30.0;  // Height of each rectangle
-    let spacing_x = 50.0;    // Horizontal spacing between rectangles
-    let spacing_y = 20.0;    // Vertical spacing between rows
+    let rect_width = 100.0; // Width of each rectangle
+    let rect_height = 30.0; // Height of each rectangle
+    let spacing_x = 50.0; // Horizontal spacing between rectangles
+    let spacing_y = 20.0; // Vertical spacing between rows
 
     // Calculate the optimal number of columns
     // We'll aim for a roughly square layout
@@ -40,7 +40,6 @@ fn setup_player(
 
     let total_width = (rect_width + spacing_x) * (num_columns as f32) - spacing_x;
     let total_height = (rect_height + spacing_y) * (num_columns as f32) - spacing_y;
-
 
     for (i, node) in g.raw_nodes().iter().enumerate() {
         commands
@@ -52,7 +51,11 @@ fn setup_player(
                     1.,
                     1.,
                 ))),
-                Transform::from_xyz((-total_width / 2.0) + (i % num_columns) as f32 * box_width, (total_height / 2.0) -((i / num_columns) as f32 * box_height), 2.),
+                Transform::from_xyz(
+                    (-total_width / 2.0) + (i % num_columns) as f32 * box_width,
+                    (total_height / 2.0) - ((i / num_columns) as f32 * box_height),
+                    2.,
+                ),
             ))
             .with_child(Text2d::new(node.weight.name.clone()));
     }
