@@ -16,7 +16,6 @@ fn main() {
         .add_plugins(FpsOverlayPlugin::default())
         .add_plugins(PanCamPlugin)
         .add_systems(Startup, (setup_player, setup_camera))
-        .add_systems(Update, move_camera)
         .run();
 }
 
@@ -65,34 +64,4 @@ fn setup_player(
 
 fn setup_camera(mut commands: Commands) {
     commands.spawn((Camera2d, PanCam::default()));
-}
-
-fn move_camera(
-    mut camera: Query<&mut Transform, (With<Camera2d>, Without<Player>)>,
-    kb_input: Res<ButtonInput<KeyCode>>,
-) {
-    let Ok(mut camera) = camera.get_single_mut() else {
-        return;
-    };
-
-    let mut direction = Vec2::ZERO;
-
-    if kb_input.pressed(KeyCode::KeyW) {
-        direction.y += 1.;
-    }
-
-    if kb_input.pressed(KeyCode::KeyS) {
-        direction.y -= 1.;
-    }
-
-    if kb_input.pressed(KeyCode::KeyA) {
-        direction.x -= 1.;
-    }
-
-    if kb_input.pressed(KeyCode::KeyD) {
-        direction.x += 1.;
-    }
-
-    let move_delta = direction.normalize_or_zero() * 10.;
-    camera.translation += move_delta.extend(0.);
 }
