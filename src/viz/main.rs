@@ -11,12 +11,6 @@ use llvm_viz::types;
 struct Node;
 
 #[derive(Component)]
-struct Edge;
-
-#[derive(Component)]
-struct Source(Entity);
-
-#[derive(Component)]
 struct Target(Entity);
 
 fn main() {
@@ -52,14 +46,19 @@ fn setup_player(
     let total_width = (RECT_WIDTH + SPACING_X) * (num_columns as f32) - SPACING_X;
     let total_height = (RECT_HEIGHT + SPACING_Y) * (num_columns as f32) - SPACING_Y;
 
-    let mut nodes_indices = Vec::new();
+    // TODO: Add rationale about us being monkeys
+    let nodes_indices: Vec<_> = g
+        .node_indices()
+        .enumerate()
+        .map(|(i, node_index)| {
+            // sanity check
+            assert_eq!(i, node_index.index());
 
-    for (i, node) in g.raw_nodes().iter().enumerate() {
-        nodes_indices.push(
+            let node = g[node_index].clone();
             commands
                 .spawn((
                     Node,
-                    node.weight.clone(),
+                    node.clone(),
                     Mesh2d(meshes.add(Rectangle::new(RECT_WIDTH, RECT_HEIGHT))),
                     MeshMaterial2d(materials.add(Color::hsv(
                         360. * (i as f32) / num_nodes as f32,
@@ -72,23 +71,15 @@ fn setup_player(
                         2.,
                     ),
                 ))
-                .with_child(Text2d::new(node.weight.name.clone()))
-                .id(),
-        );
-    }
+                .with_child(Text2d::new(node.name.clone()))
+                .id()
+        })
+        .collect();
 
-    for (i, edge) in g.raw_edges().iter().enumerate() {
-        commands.spawn((
-            Edge,
-            Source(nodes_indices[edge.source().index()]),
-            Target(nodes_indices[edge.target().index()]),
-            // node.weight.clone(),
-            Transform::from_xyz(
-                (-total_width / 2.0) + (i % num_columns) as f32 * box_width,
-                (total_height / 2.0) - ((i / num_columns) as f32 * box_height),
-                2.,
-            ),
-        ));
+    for edge in g.raw_edges().iter() {
+        let source = nodes_indices[edge.source().index()];
+        let target = nodes_indices[edge.target().index()];
+        commands.entity(source).insert(Target(target));
     }
 }
 
@@ -96,11 +87,17 @@ fn setup_camera(mut commands: Commands) {
     commands.spawn((Camera2d, PanCam::default()));
 }
 
-fn draw_edges(mut gizmos: Gizmos, query: Query<(&Transform, &Source, &Target), With<Edge>>) {
-    for (_t, Source(source), Target(target)) in &query {
-        //TODO: Draw arrow
-        let s = todo!();
-        let t = todo!();
-        gizmos.arrow_2d(s, t, Color::srgb(0., 1., 0.));
+fn draw_edges(
+    mut gizmos: Gizmos,
+    sources: Query<(&Transform, &Target), With<Node>>,
+    targets: Query<&Transform, With<Node>>,
+) {
+    for (source_transform, Target(target_id)) in sources.iter() {
+        let target_transform = targets.get(*target_id).expect("Target not found ?");
+        gizmos.arrow_2d(
+            source_transform.translation.truncate(),
+            target_transform.translation.truncate(),
+            Color::srgb(0., 1., 0.),
+        );
     }
 }
