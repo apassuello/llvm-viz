@@ -33,9 +33,9 @@ fn setup_player(
 
     let num_nodes = g.raw_nodes().len();
     const RECT_WIDTH: f32 = 300.0; // Width of each rectangle
-    const RECT_HEIGHT: f32 = 30.0; // Height of each rectangle
-    const SPACING_X: f32 = 50.0; // Horizontal spacing between rectangles
-    const SPACING_Y: f32 = 20.0; // Vertical spacing between rows
+    const RECT_HEIGHT: f32 = 300.0; // Height of each rectangle
+    const SPACING_X: f32 = 500.0; // Horizontal spacing between rectangles
+    const SPACING_Y: f32 = 500.0; // Vertical spacing between rows
 
     // Calculate the optimal number of columns
     // We'll aim for a roughly square layout

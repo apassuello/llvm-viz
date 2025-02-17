@@ -2,6 +2,7 @@
 // for a more detailed explanation.
 
 use std::path::Path;
+use regex::Regex;
 
 use llvm_plugin::inkwell::module::Module;
 use llvm_plugin::inkwell::values::{AnyValue, CallSiteValue};
@@ -11,7 +12,7 @@ use llvm_plugin::{
 
 use petgraph::dot::{Config, Dot};
 use petgraph::Graph;
-use types::FunctionBuilder;
+use types::{Function, FunctionBuilder};
 
 pub mod types;
 
@@ -31,6 +32,7 @@ struct CustomPass;
 impl LlvmModulePass for CustomPass {
     fn run_pass(&self, module: &mut Module, _manager: &ModuleAnalysisManager) -> PreservedAnalyses {
         let json_path = Path::new("omega_tree.json");
+        let direct_call_pattern = Regex::new(r"call\s+\S+\s+@\w+\(").unwrap();
 
         // Load or create graph
         let mut omega_tree = if json_path.exists() {
@@ -65,45 +67,46 @@ impl LlvmModulePass for CustomPass {
                 for instruction in basic_block.get_instructions() {
                     if let Ok(call_site_value) = CallSiteValue::try_from(instruction) {
                         
-                        
-                        let called_fn = match std::panic::catch_unwind(|| {
-                            call_site_value.get_called_fn_value()
-                        }) {
-                            Ok(fn_val) => fn_val,
-                            Err(_) => {
-                                eprintln!("Warning: Failed to get called function value");
-                                continue;
-                            }
-                        };
-                        
-                        // Notice how we handle the Result with if let Ok(...) instead of Some(...)
-                        if let Ok(fn_name) = called_fn.get_name().to_str() {
-                            // Skip LLVM intrinsics
-                            if fn_name.starts_with("llvm.") {
-                                eprintln!("Skipping LLVM intrinsic: {}", fn_name);
-                                continue;
-                            }
+                        eprint!(
+                            "1){:?}",
+                            call_site_value.as_any_value_enum()
+                        );
+                        let inst_str = instruction.print_to_string().to_string();
+                        // eprint!(
+                        //         "2){:?}",
+                        //         inst_str
+                        //     );
                             
-                            // Add to our call graph
-                            let callee = types::get_index_or_insert_node(
-                                &mut omega_tree,
-                                called_fn.into(),
-                            );
-                            omega_tree.add_edge(current_function, callee, ());
-                            
-                            eprintln!("Successfully added call to: {}", fn_name);
-                        } else {
-                            eprintln!("Warning: Function name contains invalid UTF-8");
+                        if direct_call_pattern.is_match(&inst_str) {
+                            // eprint!(
+                            //     "{:?}",
+                            //     inst_str
+                            // );
+                            let called_fn = call_site_value.get_called_fn_value();
+                            if let Ok(fn_name) = called_fn.get_name().to_str() {
+                                // Skip LLVM intrinsics
+                                if fn_name.starts_with("llvm.") {
+                                    eprintln!("Skipping LLVM intrinsic: {}", fn_name);
+                                    continue;
+                                }
+                                
+                                // Add to our call graph
+                                let callee = types::get_index_or_insert_node(
+                                    &mut omega_tree,
+                                    FunctionBuilder::new(called_fn.get_name().to_str().expect("")).build(),
+                                );
+                                omega_tree.add_edge(current_function, callee, ());
+                                
+                            } 
                         }
-                        
                     }
                 }
             }
         }
-        eprintln!(
-            "{:?}",
-            Dot::with_config(&omega_tree, &[Config::EdgeNoLabel])
-        );
+        // eprintln!(
+        //     "{:?}",
+        //     Dot::with_config(&omega_tree, &[Config::EdgeNoLabel])
+        // );
         types::append_graph(&mut omega_tree, &mut module_graph)
             .expect("Failed to append graph :shrug:");
 

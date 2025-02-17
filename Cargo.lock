@@ -2633,6 +2633,7 @@ dependencies = [
  "bevy_pancam",
  "llvm-plugin",
  "petgraph 0.7.1",
+ "regex",
  "serde",
  "serde_json",
 ]
