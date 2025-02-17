@@ -64,13 +64,38 @@ impl LlvmModulePass for CustomPass {
             for basic_block in function.get_basic_blocks() {
                 for instruction in basic_block.get_instructions() {
                     if let Ok(call_site_value) = CallSiteValue::try_from(instruction) {
-                        if call_site_value.as_any_value_enum().is_function_value() {
+                        
+                        
+                        let called_fn = match std::panic::catch_unwind(|| {
+                            call_site_value.get_called_fn_value()
+                        }) {
+                            Ok(fn_val) => fn_val,
+                            Err(_) => {
+                                eprintln!("Warning: Failed to get called function value");
+                                continue;
+                            }
+                        };
+                        
+                        // Notice how we handle the Result with if let Ok(...) instead of Some(...)
+                        if let Ok(fn_name) = called_fn.get_name().to_str() {
+                            // Skip LLVM intrinsics
+                            if fn_name.starts_with("llvm.") {
+                                eprintln!("Skipping LLVM intrinsic: {}", fn_name);
+                                continue;
+                            }
+                            
+                            // Add to our call graph
                             let callee = types::get_index_or_insert_node(
                                 &mut omega_tree,
-                                call_site_value.get_called_fn_value().into(),
+                                called_fn.into(),
                             );
                             omega_tree.add_edge(current_function, callee, ());
+                            
+                            eprintln!("Successfully added call to: {}", fn_name);
+                        } else {
+                            eprintln!("Warning: Function name contains invalid UTF-8");
                         }
+                        
                     }
                 }
             }
