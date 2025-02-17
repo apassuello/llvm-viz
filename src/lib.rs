@@ -71,15 +71,8 @@ impl LlvmModulePass for CustomPass {
             for basic_block in function.get_basic_blocks() {
                 for instruction in basic_block.get_instructions() {
                     if let Ok(call_site_value) = CallSiteValue::try_from(instruction) {
-                        eprintln!("1){:?}", call_site_value.as_any_value_enum());
-                        let inst_str = instruction.print_to_string().to_string();
-                        // eprint!(
-                        //         "2){:?}",
-                        //         inst_str
-                        //     );
-
-                        if !direct_call_pattern.is_match(&inst_str) {
-                            eprint!("{:?}", inst_str);
+                        if !direct_call_pattern.is_match(&instruction.print_to_string().to_string())
+                        {
                             let called_fn = call_site_value.get_called_fn_value();
                             if let Ok(fn_name) = called_fn.get_name().to_str() {
                                 // Skip LLVM intrinsics
