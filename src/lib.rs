@@ -1,8 +1,8 @@
 // See https://github.com/banach-space/llvm-tutor/blob/main/HelloWorld/HelloWorld.cpp
 // for a more detailed explanation.
 
-use std::path::Path;
 use regex::Regex;
+use std::path::Path;
 
 use llvm_plugin::inkwell::module::Module;
 use llvm_plugin::inkwell::values::{AnyValue, CallSiteValue};
@@ -32,7 +32,12 @@ struct CustomPass;
 impl LlvmModulePass for CustomPass {
     fn run_pass(&self, module: &mut Module, _manager: &ModuleAnalysisManager) -> PreservedAnalyses {
         let json_path = Path::new("omega_tree.json");
-        let direct_call_pattern = Regex::new(r"call\s+\S+\s+@\w+\(").unwrap();
+        // Regex: ^ -> Start of the line
+        // [^(]* -> All the chars that are not opening parenthesis
+        // % -> Percent sign (Denoting a register in IR)
+        // \d+ -> A number (name of the register. Auto assigned by LLVM)
+        // \( -> The opening parenthesis (Denoting a function signature)
+        let direct_call_pattern = Regex::new(r"^[^(]*%\d+\(").unwrap();
 
         // Load or create graph
         let mut omega_tree = if json_path.exists() {
@@ -66,22 +71,15 @@ impl LlvmModulePass for CustomPass {
             for basic_block in function.get_basic_blocks() {
                 for instruction in basic_block.get_instructions() {
                     if let Ok(call_site_value) = CallSiteValue::try_from(instruction) {
-                        
-                        eprint!(
-                            "1){:?}",
-                            call_site_value.as_any_value_enum()
-                        );
+                        eprintln!("1){:?}", call_site_value.as_any_value_enum());
                         let inst_str = instruction.print_to_string().to_string();
                         // eprint!(
                         //         "2){:?}",
                         //         inst_str
                         //     );
-                            
-                        if direct_call_pattern.is_match(&inst_str) {
-                            // eprint!(
-                            //     "{:?}",
-                            //     inst_str
-                            // );
+
+                        if !direct_call_pattern.is_match(&inst_str) {
+                            eprint!("{:?}", inst_str);
                             let called_fn = call_site_value.get_called_fn_value();
                             if let Ok(fn_name) = called_fn.get_name().to_str() {
                                 // Skip LLVM intrinsics
@@ -89,15 +87,15 @@ impl LlvmModulePass for CustomPass {
                                     eprintln!("Skipping LLVM intrinsic: {}", fn_name);
                                     continue;
                                 }
-                                
+
                                 // Add to our call graph
                                 let callee = types::get_index_or_insert_node(
                                     &mut omega_tree,
-                                    FunctionBuilder::new(called_fn.get_name().to_str().expect("")).build(),
+                                    FunctionBuilder::new(called_fn.get_name().to_str().expect(""))
+                                        .build(),
                                 );
                                 omega_tree.add_edge(current_function, callee, ());
-                                
-                            } 
+                            }
                         }
                     }
                 }
