@@ -2,6 +2,7 @@ use bevy::dev_tools::fps_overlay::FpsOverlayPlugin;
 use bevy::prelude::*;
 use bevy_pancam::{PanCam, PanCamPlugin};
 use petgraph::dot::{Config, Dot};
+use rand::prelude::*;
 
 use std::path::Path;
 
@@ -92,12 +93,18 @@ fn draw_edges(
     sources: Query<(&Transform, &Target), With<Node>>,
     targets: Query<&Transform, With<Node>>,
 ) {
+    let mut rng = SmallRng::from_seed([0; 32]);
     for (source_transform, Target(target_id)) in sources.iter() {
         let target_transform = targets.get(*target_id).expect("Target not found ?");
         gizmos.arrow_2d(
             source_transform.translation.truncate(),
             target_transform.translation.truncate(),
-            Color::srgb(0., 1., 0.),
+            Color::hsv(
+                360. * rng
+                    .sample::<f32, rand::distr::StandardUniform>(rand::distr::StandardUniform),
+                1.,
+                1.,
+            ),
         );
     }
 }
