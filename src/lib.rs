@@ -12,7 +12,7 @@ use llvm_plugin::{
 
 use petgraph::dot::{Config, Dot};
 use petgraph::Graph;
-use types::{Function, FunctionBuilder};
+use types::FunctionBuilder;
 
 pub mod types;
 
@@ -77,7 +77,6 @@ impl LlvmModulePass for CustomPass {
                             if let Ok(fn_name) = called_fn.get_name().to_str() {
                                 // Skip LLVM intrinsics
                                 if fn_name.starts_with("llvm.") {
-                                    eprintln!("Skipping LLVM intrinsic: {}", fn_name);
                                     continue;
                                 }
 
@@ -94,10 +93,10 @@ impl LlvmModulePass for CustomPass {
                 }
             }
         }
-        // eprintln!(
-        //     "{:?}",
-        //     Dot::with_config(&omega_tree, &[Config::EdgeNoLabel])
-        // );
+        eprintln!(
+            "{:?}",
+            Dot::with_config(&omega_tree, &[Config::EdgeNoLabel])
+        );
         types::append_graph(&mut omega_tree, &mut module_graph)
             .expect("Failed to append graph :shrug:");
 
